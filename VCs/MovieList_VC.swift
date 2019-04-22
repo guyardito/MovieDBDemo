@@ -14,10 +14,28 @@ class MovieList_VC: UITableViewController {
 	
 	var movies: [PagedMovies.Movie] = []
 	
+	let popularQueryService = MovieDBQueryService(queryType: .Popular)
 	
 	var queryService:MovieDBQueryService?
 	
 	
+	
+	
+	func startDownload() {
+		queryService?.getSearchResults(page:1, pageLoaded: { [ weak self ] movies, currentPage, totalPages, errorStr in
+			self?.movies += movies!
+			
+			if currentPage != totalPages {
+				self?.title = "\(100 * currentPage / totalPages)% " + (self?.queryService?.queryType)!.rawValue
+			} else {
+				self?.title = (self?.queryService?.queryType)!.rawValue
+			}
+			
+			if currentPage == 1  ||  currentPage == totalPages  ||  currentPage % 15 == 0 {
+				self?.tableView.reloadData()
+			}
+		} )
+	}
 	
 	
 	
@@ -28,18 +46,7 @@ class MovieList_VC: UITableViewController {
 		// self.clearsSelectionOnViewWillAppear = false
 		
 		self.tableView.rowHeight = UITableView.automaticDimension
-		self.tableView.estimatedRowHeight = 400.0 // set to whatever your "average" cell height is
-
-		queryService = MovieDBQueryService(queryType: .Popular)
-
-		queryService?.getSearchResults(page:1, pageLoaded: { [ weak self ] movies, currentPage, totalPages, errorStr in
-			self?.movies += movies!
-			
-			if currentPage == 1  ||  currentPage == totalPages  ||  currentPage % 15 == 0 {
-				self?.tableView.reloadData()
-			}
-		} )
-
+		self.tableView.estimatedRowHeight = 125.0 // set to whatever your "average" cell height is
 	}
 	
 	
@@ -64,8 +71,8 @@ class MovieList_VC: UITableViewController {
 		cell.posterPath?.text = movie.poster_path
 		cell.overview?.text = movie.overview
 		
-		
 		DispatchQueue.global(qos: .userInitiated).async {
+			
 			if movie.posterURL(width: 200) != nil {
 				let url = URL(string: movie.posterURL(width: 200)!)
 				do {
@@ -87,6 +94,7 @@ class MovieList_VC: UITableViewController {
 		}
 		
 		
+		// Configure the cell...
 		
 		return cell
 	}
