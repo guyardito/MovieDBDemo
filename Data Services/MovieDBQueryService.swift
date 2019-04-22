@@ -83,9 +83,10 @@ class MovieDBQueryService {
 					print("delay for \(delayString) seconds...")
 					
 					//print(response)
-					let delay:Double = Double(delayString) as! Double
-					DispatchQueue.main.asyncAfter(deadline: .now() + delay ) {
-						self.getSearchResults(page: page, pageLoaded: pageLoaded )
+					if let delay = Double(delayString)  {
+						DispatchQueue.main.asyncAfter(deadline: .now() + delay ) {
+							self.getSearchResults(page: page, pageLoaded: pageLoaded )
+						}
 					}
 				}
 			}
