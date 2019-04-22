@@ -71,31 +71,26 @@ class MovieList_VC: UITableViewController {
 		cell.posterPath?.text = movie.poster_path
 		cell.overview?.text = movie.overview
 		
+		cell.poster?.image = nil  // make sure we start fresh  :)
+
+		
+		guard let urlAsString = movie.posterURL(width: 200) else {
+			return cell
+		}
+		
 		DispatchQueue.global(qos: .userInitiated).async {
-			
-			if movie.posterURL(width: 200) != nil {
-				let url = URL(string: movie.posterURL(width: 200)!)
-				do {
-					if let data = try? Data(contentsOf: url!) {
-						DispatchQueue.main.async {
-							
-							cell.poster?.image = UIImage(data: data)
-						}
-					} else {
-						// something wrong with data, not much for us to do here yet
-					}
-				} catch {
-					print(error.localizedDescription)
+			if let url = URL(string: urlAsString) {
+				guard let data = try? Data(contentsOf: url ) else {
+					return
 				}
 				
-			} else {
-				cell.poster?.image = nil
+				DispatchQueue.main.async {
+					cell.poster?.image = UIImage(data: data)
+				}
 			}
 		}
 		
-		
-		// Configure the cell...
-		
+				
 		return cell
 	}
 	
