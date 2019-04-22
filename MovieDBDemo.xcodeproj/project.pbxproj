@@ -19,6 +19,7 @@
 		672C5BA5226DF22300830ECE /* MovieList_VC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BA4226DF22300830ECE /* MovieList_VC.swift */; };
 		672C5BA7226DF27000830ECE /* MovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BA6226DF27000830ECE /* MovieCell.swift */; };
 		672C5BA9226E046800830ECE /* CustomTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BA8226E046800830ECE /* CustomTabBarController.swift */; };
+		672C5BAC226E073B00830ECE /* PagedMovies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BAB226E073B00830ECE /* PagedMovies.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		672C5BA4226DF22300830ECE /* MovieList_VC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieList_VC.swift; sourceTree = "<group>"; };
 		672C5BA6226DF27000830ECE /* MovieCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCell.swift; sourceTree = "<group>"; };
 		672C5BA8226E046800830ECE /* CustomTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarController.swift; sourceTree = "<group>"; };
+		672C5BAB226E073B00830ECE /* PagedMovies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedMovies.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,8 +91,10 @@
 			children = (
 				672C5BA2226DEDA100830ECE /* README.md */,
 				672C5BA0226DE95900830ECE /* READ_ME.rtf */,
+				672C5BAA226E071300830ECE /* Views */,
 				672C5B9D226DE86800830ECE /* VCs */,
 				672C5B9C226DE85F00830ECE /* Models */,
+				672C5BAD226E077E00830ECE /* Data Services */,
 				672C5B6D226DE64300830ECE /* MovieDBDemo */,
 				672C5B82226DE64400830ECE /* MovieDBDemoTests */,
 				672C5B8D226DE64400830ECE /* MovieDBDemoUITests */,
@@ -140,7 +144,7 @@
 		672C5B9C226DE85F00830ECE /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				672C5B9E226DE8D000830ECE /* MovieDBQueryService.swift */,
+				672C5BAB226E073B00830ECE /* PagedMovies.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -150,10 +154,25 @@
 			children = (
 				672C5B72226DE64300830ECE /* Main.storyboard */,
 				672C5BA4226DF22300830ECE /* MovieList_VC.swift */,
-				672C5BA6226DF27000830ECE /* MovieCell.swift */,
 				672C5BA8226E046800830ECE /* CustomTabBarController.swift */,
 			);
 			path = VCs;
+			sourceTree = "<group>";
+		};
+		672C5BAA226E071300830ECE /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				672C5BA6226DF27000830ECE /* MovieCell.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		672C5BAD226E077E00830ECE /* Data Services */ = {
+			isa = PBXGroup;
+			children = (
+				672C5B9E226DE8D000830ECE /* MovieDBQueryService.swift */,
+			);
+			path = "Data Services";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -289,6 +308,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				672C5BAC226E073B00830ECE /* PagedMovies.swift in Sources */,
 				672C5B6F226DE64300830ECE /* AppDelegate.swift in Sources */,
 				672C5B9F226DE8D000830ECE /* MovieDBQueryService.swift in Sources */,
 				672C5BA9226E046800830ECE /* CustomTabBarController.swift in Sources */,
