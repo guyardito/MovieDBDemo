@@ -14,7 +14,6 @@
 		672C5B84226DE64400830ECE /* MovieDBDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5B83226DE64400830ECE /* MovieDBDemoTests.swift */; };
 		672C5B8F226DE64400830ECE /* MovieDBDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5B8E226DE64400830ECE /* MovieDBDemoUITests.swift */; };
 		672C5B9F226DE8D000830ECE /* MovieDBQueryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5B9E226DE8D000830ECE /* MovieDBQueryService.swift */; };
-		672C5BA1226DE95900830ECE /* READ_ME.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 672C5BA0226DE95900830ECE /* READ_ME.rtf */; };
 		672C5BA3226DEDA100830ECE /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 672C5BA2226DEDA100830ECE /* README.md */; };
 		672C5BA5226DF22300830ECE /* MovieList_VC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BA4226DF22300830ECE /* MovieList_VC.swift */; };
 		672C5BA7226DF27000830ECE /* MovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BA6226DF27000830ECE /* MovieCell.swift */; };
@@ -53,7 +52,6 @@
 		672C5B8E226DE64400830ECE /* MovieDBDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDBDemoUITests.swift; sourceTree = "<group>"; };
 		672C5B90226DE64400830ECE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		672C5B9E226DE8D000830ECE /* MovieDBQueryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDBQueryService.swift; sourceTree = "<group>"; };
-		672C5BA0226DE95900830ECE /* READ_ME.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = READ_ME.rtf; sourceTree = "<group>"; };
 		672C5BA2226DEDA100830ECE /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		672C5BA4226DF22300830ECE /* MovieList_VC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieList_VC.swift; sourceTree = "<group>"; };
 		672C5BA6226DF27000830ECE /* MovieCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCell.swift; sourceTree = "<group>"; };
@@ -90,7 +88,6 @@
 			isa = PBXGroup;
 			children = (
 				672C5BA2226DEDA100830ECE /* README.md */,
-				672C5BA0226DE95900830ECE /* READ_ME.rtf */,
 				672C5BAA226E071300830ECE /* Views */,
 				672C5B9D226DE86800830ECE /* VCs */,
 				672C5B9C226DE85F00830ECE /* Models */,
@@ -282,7 +279,6 @@
 				672C5B79226DE64400830ECE /* LaunchScreen.storyboard in Resources */,
 				672C5B76226DE64400830ECE /* Assets.xcassets in Resources */,
 				672C5BA3226DEDA100830ECE /* README.md in Resources */,
-				672C5BA1226DE95900830ECE /* READ_ME.rtf in Resources */,
 				672C5B74226DE64300830ECE /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
