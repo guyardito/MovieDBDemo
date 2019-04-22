@@ -27,6 +27,9 @@ class MovieList_VC: UITableViewController {
 		// Uncomment the following line to preserve selection between presentations
 		// self.clearsSelectionOnViewWillAppear = false
 		
+		self.tableView.rowHeight = UITableView.automaticDimension
+		self.tableView.estimatedRowHeight = 400.0 // set to whatever your "average" cell height is
+
 		queryService = MovieDBQueryService(queryType: .Popular)
 
 		queryService?.getSearchResults(page:1, pageLoaded: { [ weak self ] movies, currentPage, totalPages, errorStr in
@@ -57,11 +60,33 @@ class MovieList_VC: UITableViewController {
 		
 		let movie = movies[indexPath.row]
 		
-		cell.textLabel?.text = movie.title
-
+		cell.title?.text = movie.title
+		cell.posterPath?.text = movie.poster_path
+		cell.overview?.text = movie.overview
 		
 		
-		// Configure the cell...
+		DispatchQueue.global(qos: .userInitiated).async {
+			if movie.posterURL(width: 200) != nil {
+				let url = URL(string: movie.posterURL(width: 200)!)
+				do {
+					if let data = try? Data(contentsOf: url!) {
+						DispatchQueue.main.async {
+							
+							cell.poster?.image = UIImage(data: data)
+						}
+					} else {
+						// something wrong with data, not much for us to do here yet
+					}
+				} catch {
+					print(error.localizedDescription)
+				}
+				
+			} else {
+				cell.poster?.image = nil
+			}
+		}
+		
+		
 		
 		return cell
 	}
