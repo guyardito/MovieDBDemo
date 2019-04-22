@@ -3,7 +3,7 @@ simple demo of accessing the public APIs of TheMovieDB.org
 
 
 
-##CHALLENGES
+### CHALLENGES
 Originally considered using a cocoapod for API access but the one that I found had an empty "Demo" directory, and given it was quite a large library it seemed like it would take more time to figure out how to use it than to just write code to go against the API
 
 API didn't work when page # was the first parameter
@@ -12,7 +12,7 @@ API for image rejects most sizes
 
 
 
-##NOTES
+### NOTES
 Created the viewControllers programmatically rather than thru storyboard b/c app is such that same view controller class is used four time, and includes a custom tableViewCell.  Going through storyboard would necessitate four viewController classes and four custom tableViewCells.  So, that's not great for maintenance.
 
 Designed app so that all VCs begin loading when the app starts up, and pushed the longer ones down the tabbar so they can have a "head start" loading while the user is initially brought to one of the shorter lists.
@@ -21,7 +21,7 @@ Also, the title is periodically changed while loading to show progress; this is 
 
 
 
-##AREAS FOR EXTENSION / IMPROVEMENT
+### AREAS FOR EXTENSION / IMPROVEMENT
 right now the UI is prone to jump/jitter while the user scrolls because the data takes a long time to load and (under current design) the table is given a 'reload' command after every page (typically 20 entries) is downloaded.  An effort has been made to mitigate this by only reloading after every 15 update signals
 
 The data doesn't come back in any obvious order.  Sorting according to some criteria, perhaps user-specified, would be useful.  This would, however, present certain UI issues while the data is still being loaded.
