@@ -30,10 +30,14 @@ enum MovieCategory : String {
 
 
 
-typealias FetchCompletion = () -> ()
 
 
 class MovieDB_DataServer {
+	
+	
+	typealias FetchCompletion = () -> ()
+
+	
 	
 	static var shared = MovieDB_DataServer()
 	
@@ -100,9 +104,6 @@ Note that the current requirements and design of the app are such that there is 
 
 fileprivate class MovieDB_PageLoader {
 	
-	typealias QueryResult = ([MovieInfo]?, Int, Int, String) -> ()
-	
-	
 	let apiKey = "b4f08cc8d958e1b0f9f17de17a588d3a"
 	let language = "en-US"
 	
@@ -162,7 +163,7 @@ fileprivate class MovieDB_PageLoader {
 	
 	
 	
-	func fetch_via_Alamofire(page:Int, doSynchronously:Bool=false, completion:FetchCompletion?=nil)  {
+	func fetch_via_Alamofire(page:Int, doSynchronously:Bool=false, completion:MovieDB_DataServer.FetchCompletion?=nil)  {
 		
 		if moviesByPage[page] != nil {
 			// we either already have the data or are already fetching it, so ignore request
@@ -206,19 +207,25 @@ fileprivate class MovieDB_PageLoader {
 				let data = response.data
 				
 				let decoder = JSONDecoder()
-				let pagedMovies = try! decoder.decode(PagedMovies.self, from: data!)
-				
-				self.numberOfPages = pagedMovies.numberOfPages
-				self.numberOfMovies = pagedMovies.numberOfMovies
-				
-				self.moviesByPage[page] = pagedMovies.movies
-				
-				if completion != nil {
-					completion!()
-				}
-				
-				if doSynchronously {
-					semaphore.signal()
+				do {
+					let pagedMovies = try decoder.decode(PagedMovies.self, from: data!)
+					
+					self.numberOfPages = pagedMovies.numberOfPages
+					self.numberOfMovies = pagedMovies.numberOfMovies
+					
+					self.moviesByPage[page] = pagedMovies.movies
+					
+					if completion != nil {
+						completion!()
+					}
+					
+					if doSynchronously {
+						semaphore.signal()
+					}
+					
+				} catch let error {
+					print("ERROR JSON not formed according to expected schema from PagedMovies")
+					print(error)
 				}
 				
 		}
@@ -237,7 +244,7 @@ fileprivate class MovieDB_PageLoader {
 	var errorMessage = ""
 	
 	
-	func fetch_via_native(page:Int, doSynchronously:Bool=false, completion:FetchCompletion?=nil)  {
+	func fetch_via_native(page:Int, doSynchronously:Bool=false, completion:MovieDB_DataServer.FetchCompletion?=nil)  {
 		
 		if moviesByPage[page] != nil {
 			// we either already have the data or are already fetching it, so ignore request
@@ -251,9 +258,9 @@ fileprivate class MovieDB_PageLoader {
 		var urlComponents = URLComponents(string:api)
 		
 		if regionFilter != nil {
-			urlComponents?.query = "?language=\(language)&region=\(regionFilter!)&api_key=\(apiKey)&page=\(page)"
+			urlComponents?.query = "language=\(language)&region=\(regionFilter!)&api_key=\(apiKey)&page=\(page)"
 		} else {
-			urlComponents?.query = "?language=\(language)&api_key=\(apiKey)&page=\(page)"
+			urlComponents?.query = "language=\(language)&api_key=\(apiKey)&page=\(page)"
 		}
 		
 		guard let url = urlComponents?.url else { return }
@@ -277,15 +284,21 @@ fileprivate class MovieDB_PageLoader {
 				print("loaded \(data.count) bytes")
 				
 				let decoder = JSONDecoder()
-				let pagedMovies = try! decoder.decode(PagedMovies.self, from: data)
-				
-				self.numberOfPages = pagedMovies.numberOfPages
-				self.numberOfMovies = pagedMovies.numberOfMovies
-				
-				self.moviesByPage[page] = pagedMovies.movies
-				
-				if completion != nil {
-					completion!()
+				do {
+					let pagedMovies = try decoder.decode(PagedMovies.self, from: data)
+					
+					self.numberOfPages = pagedMovies.numberOfPages
+					self.numberOfMovies = pagedMovies.numberOfMovies
+					
+					self.moviesByPage[page] = pagedMovies.movies
+					
+					if completion != nil {
+						completion!()
+					}
+					
+				} catch let error {
+					print("ERROR JSON not formed according to expected schema from PagedMovies")
+					print(error)
 				}
 				
 			} else {

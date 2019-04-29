@@ -83,7 +83,6 @@ class MovieInfo_Table: UITableViewController {
 extension  MovieInfo_Table: UITableViewDataSourcePrefetching {
 	
 	func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-		//print("prefetchRowsAt \(indexPaths)")
 		indexPaths.forEach {
 			MovieDB_DataServer.shared.fetch(category: category, index: $0.row)
 		}
@@ -91,10 +90,9 @@ extension  MovieInfo_Table: UITableViewDataSourcePrefetching {
 	
 	
 	func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-		print("cancelPrefetchingForRowsAt \(indexPaths)")
-		for _ in  indexPaths {
-			print(".")
+		for i in  indexPaths {
 			// we're not worrying about cancelling in this app because each download is fairly small (about 12k)
+			print("NOTE  request to cancel fetch of movie at index \(i.row), ignoring...")
 		}
 	}
 }
