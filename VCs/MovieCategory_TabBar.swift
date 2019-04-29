@@ -12,13 +12,33 @@ import UIKit
 class MovieCategory_TabBar: UITabBarController {
 	
 	
-	func makeVCAndNavController(queryType:QueryType, title:String, tag:Int) -> UINavigationController {
+	
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		
+		var tabBarList = [UINavigationController]()
+		
+		let categories = MovieDB_App.shared.categoriesToDisplay()
+		for (index, c) in categories.enumerated() {
+			let vc = makeVCAndNavController(category: c, title: c.rawValue, tag: index)
+			tabBarList.append(vc)
+			
+		}
+		
+		viewControllers = tabBarList
+	}
+	
+	
+	
+	func makeVCAndNavController(category:MovieCategory, title:String, tag:Int) -> UINavigationController {
 		
 		let storyboard = UIStoryboard(name: "Main", bundle: nil)
 		
-		let vc = storyboard.instantiateViewController(withIdentifier: "MovieList_VC") as! MovieInfo_Table
-		vc.queryService = MovieDB_DataServer(queryType: queryType)
+		let vc = storyboard.instantiateViewController(withIdentifier: "MovieInfo_Table_VC") as! MovieInfo_Table
+		vc.category = category
+		vc.queryService = MovieDB_DataServer(queryType: category)
 		vc.startDownload()
+
 		let navController = UINavigationController()
 		navController.viewControllers = [vc]
 		navController.tabBarItem = UITabBarItem(title: title, image: nil, tag: tag)
@@ -26,27 +46,7 @@ class MovieCategory_TabBar: UITabBarController {
 		return navController
 	}
 	
-	
-	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		
-		
-		let nowPlaying = makeVCAndNavController(queryType: .NowPlaying, title: "Now Playing", tag: 0)
-		
-		let upcoming = makeVCAndNavController(queryType: .Upcoming, title: "Upcoming", tag: 1)
-		
-		let topRated = makeVCAndNavController(queryType: .TopRated, title: "Top Rated", tag: 2)
-		
-		let popular = makeVCAndNavController(queryType: .Popular, title: "Popular", tag: 3)
-		
-		
-		
-		let tabBarList = [nowPlaying, upcoming, topRated, popular]
-		
-		viewControllers = tabBarList
-	}
-	
+
 	
 	/*
 	// MARK: - Navigation

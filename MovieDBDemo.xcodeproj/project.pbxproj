@@ -19,6 +19,7 @@
 		672C5BA7226DF27000830ECE /* MovieInfo_Cell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BA6226DF27000830ECE /* MovieInfo_Cell.swift */; };
 		672C5BA9226E046800830ECE /* MovieCategory_TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BA8226E046800830ECE /* MovieCategory_TabBar.swift */; };
 		672C5BAC226E073B00830ECE /* MovieInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C5BAB226E073B00830ECE /* MovieInfo.swift */; };
+		67F7F79B22773A75004B133F /* MovieDB_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67F7F79A22773A75004B133F /* MovieDB_App.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		672C5BA6226DF27000830ECE /* MovieInfo_Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieInfo_Cell.swift; sourceTree = "<group>"; };
 		672C5BA8226E046800830ECE /* MovieCategory_TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCategory_TabBar.swift; sourceTree = "<group>"; };
 		672C5BAB226E073B00830ECE /* MovieInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieInfo.swift; sourceTree = "<group>"; };
+		67F7F79A22773A75004B133F /* MovieDB_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDB_App.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +94,7 @@
 				672C5BAD226E077E00830ECE /* Data Services */,
 				672C5BAA226E071300830ECE /* Views */,
 				672C5B9D226DE86800830ECE /* VCs */,
+				67F7F79922773A5C004B133F /* The App */,
 				672C5B6D226DE64300830ECE /* MovieDBDemo */,
 				672C5B82226DE64400830ECE /* MovieDBDemoTests */,
 				672C5B8D226DE64400830ECE /* MovieDBDemoUITests */,
@@ -170,6 +173,14 @@
 				672C5B9E226DE8D000830ECE /* MovieDB_DataServer.swift */,
 			);
 			path = "Data Services";
+			sourceTree = "<group>";
+		};
+		67F7F79922773A5C004B133F /* The App */ = {
+			isa = PBXGroup;
+			children = (
+				67F7F79A22773A75004B133F /* MovieDB_App.swift */,
+			);
+			path = "The App";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -304,6 +315,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67F7F79B22773A75004B133F /* MovieDB_App.swift in Sources */,
 				672C5BAC226E073B00830ECE /* MovieInfo.swift in Sources */,
 				672C5B6F226DE64300830ECE /* AppDelegate.swift in Sources */,
 				672C5B9F226DE8D000830ECE /* MovieDB_DataServer.swift in Sources */,

@@ -10,11 +10,11 @@ import Foundation
 
 
 
-enum QueryType : String {
-	case NowPlaying =  "now_playing"  // 55 pages
-	case Popular =  "popular"  // 990 pages
-	case TopRated = "top_rated"  // 357 pages
-	case Upcoming = "upcoming"  // 10 pages
+enum MovieCategory : String {
+	case NowPlaying = "now_playing"
+	case Popular = "popular"
+	case TopRated = "top_rated"
+	case Upcoming = "upcoming"
 	
 }
 
@@ -39,11 +39,11 @@ class MovieDB_DataServer {
 	var movies: [MovieInfo] = []
 	var errorMessage = ""
 	
-	var queryType:QueryType
+	var queryType:MovieCategory
 	
 	
 	
-	init(queryType:QueryType) {
+	init(queryType:MovieCategory) {
 		self.queryType = queryType
 	}
 	
@@ -56,9 +56,10 @@ class MovieDB_DataServer {
 		dataTask?.cancel()
 		
 		var urlComponents = URLComponents(string: "https://api.themoviedb.org/3/movie/\(queryType.rawValue)")
-		urlComponents?.query = "?language=\(language)&api_key=\(apiKey)&page=\(page)"
+		urlComponents?.query = "language=\(language)&api_key=\(apiKey)&page=\(page)"
 		
-		guard let url = urlComponents?.url else { return }
+		guard let url = urlComponents?.url else {
+			return }
 		
 		//print("do \(url)")
 		

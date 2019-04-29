@@ -12,6 +12,8 @@ import UIKit
 class MovieInfo_Table: UITableViewController {
 	
 	
+	var category:MovieCategory = .NowPlaying
+	
 	var movies: [MovieInfo] = []
 	
 	let popularQueryService = MovieDB_DataServer(queryType: .Popular)
