@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Alamofire
 
 
 
@@ -68,7 +69,8 @@ class MovieDB_DataServer {
 	func fetch(category:MovieCategory, page:Int, doSynchronously:Bool=false, completion:FetchCompletion?=nil) {
 		let categoryLoader = getCategoryLoaderFor(category: category)
 		
-		categoryLoader.fetch(page: page, doSynchronously: doSynchronously, completion: completion)
+		//categoryLoader.fetch_via_native(page: page, doSynchronously: doSynchronously, completion: completion)
+		categoryLoader.fetch_via_Alamofire(page: page, doSynchronously: doSynchronously, completion: completion)
 	}
 	
 	
@@ -160,13 +162,82 @@ fileprivate class MovieDB_PageLoader {
 	
 	
 	
+	func fetch_via_Alamofire(page:Int, doSynchronously:Bool=false, completion:FetchCompletion?=nil)  {
+		
+		if moviesByPage[page] != nil {
+			// we either already have the data or are already fetching it, so ignore request
+			return
+		}
+		self.moviesByPage[page] = [MovieInfo]()
+		
+		
+		let api = apiForCategory(category: category)
+		
+		let semaphore = DispatchSemaphore(value: 0)
+		
+		let parameters:[String:Any] = ["language": language, "api_key": apiKey, "page":page]
+		
+		Alamofire.request(api, method: .get, parameters: parameters /*, encoding: URLEncoding(destination: .queryString) */ )
+			
+			.validate { request, response, data in
+				if response.statusCode >= 300 {
+					if let delayString:String = response.allHeaderFields["Retry-After"] as? String {
+						print("delay for \(delayString) seconds...")
+						
+						//print(response)
+						if let delay = Double(delayString)  {
+							DispatchQueue.main.asyncAfter(deadline: .now() + delay ) {
+								self.fetch_via_Alamofire(page: page)
+							}
+						}
+					}
+					return .success
+					
+				} else {
+					/*
+					beyond scope of this project to do much error handling
+					*/
+					return .success
+				}
+			}
+			
+			.response {
+				response in
+				let data = response.data
+				
+				let decoder = JSONDecoder()
+				let pagedMovies = try! decoder.decode(PagedMovies.self, from: data!)
+				
+				self.numberOfPages = pagedMovies.numberOfPages
+				self.numberOfMovies = pagedMovies.numberOfMovies
+				
+				self.moviesByPage[page] = pagedMovies.movies
+				
+				if completion != nil {
+					completion!()
+				}
+				
+				if doSynchronously {
+					semaphore.signal()
+				}
+				
+		}
+		
+		
+		if doSynchronously {
+			_ = semaphore.wait(timeout: .distantFuture)
+		}
+	}
+	
+	
+	
 	
 	
 	let defaultSession = URLSession(configuration: .default)
 	var errorMessage = ""
 	
 	
-	func fetch(page:Int, doSynchronously:Bool=false, completion:FetchCompletion?=nil)  {
+	func fetch_via_native(page:Int, doSynchronously:Bool=false, completion:FetchCompletion?=nil)  {
 		
 		if moviesByPage[page] != nil {
 			// we either already have the data or are already fetching it, so ignore request
@@ -180,9 +251,9 @@ fileprivate class MovieDB_PageLoader {
 		var urlComponents = URLComponents(string:api)
 		
 		if regionFilter != nil {
-			urlComponents?.query = "language=\(language)&region=\(regionFilter!)&api_key=\(apiKey)&page=\(page)"
+			urlComponents?.query = "?language=\(language)&region=\(regionFilter!)&api_key=\(apiKey)&page=\(page)"
 		} else {
-			urlComponents?.query = "language=\(language)&api_key=\(apiKey)&page=\(page)"
+			urlComponents?.query = "?language=\(language)&api_key=\(apiKey)&page=\(page)"
 		}
 		
 		guard let url = urlComponents?.url else { return }
@@ -224,7 +295,7 @@ fileprivate class MovieDB_PageLoader {
 					//print(response)
 					if let delay = Double(delayString)  {
 						DispatchQueue.main.asyncAfter(deadline: .now() + delay ) {
-							self.fetch(page: page)
+							self.fetch_via_native(page: page)
 						}
 					}
 				}
@@ -248,7 +319,7 @@ fileprivate class MovieDB_PageLoader {
 	func fetch(at index:Int) {
 		let page = pageFor(itemIndex: index)
 		
-		fetch(page: page)
+		fetch_via_native(page: page)
 	}
 	
 	
@@ -279,10 +350,6 @@ fileprivate class MovieDB_PageLoader {
 	
 	
 }
-
-
-
-
 
 
 

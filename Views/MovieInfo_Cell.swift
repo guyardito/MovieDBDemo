@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Kingfisher
+
 
 class MovieInfo_Cell: UITableViewCell {
 	
@@ -29,5 +31,25 @@ class MovieInfo_Cell: UITableViewCell {
 	}
 	
 	
+	func populateFrom(movie:MovieInfo) {
+		title?.text = movie.title
+		posterPath?.text = movie.poster_path
+		overview?.text = movie.overview
+		poster?.image = nil  // make sure we start fresh  :)
+		
+		
+		guard let urlAsString = movie.posterURL(width: 200) else {
+			return
+		}
+		
+		guard let url = URL(string: urlAsString) else {
+			return
+		}
+		
+		DispatchQueue.global(qos: .userInitiated).async {
+			self.poster?.kf.setImage(with:url)  // use Kingfisher: will use cache and also update imageView on the main thread
+		}
+		
+	}
 	
 }

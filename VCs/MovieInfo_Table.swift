@@ -57,28 +57,7 @@ class MovieInfo_Table: UITableViewController {
 		
 		let movie = MovieDB_DataServer.shared.getMovieFrom(category: category, at: indexPath.row)
 		
-		cell.title?.text = movie.title
-		cell.posterPath?.text = movie.poster_path
-		cell.overview?.text = movie.overview
-		
-		cell.poster?.image = nil  // make sure we start fresh  :)
-		
-		
-		guard let urlAsString = movie.posterURL(width: 200) else {
-			return cell
-		}
-		
-		DispatchQueue.global(qos: .userInitiated).async {
-			if let url = URL(string: urlAsString) {
-				guard let data = try? Data(contentsOf: url ) else {
-					return
-				}
-				
-				DispatchQueue.main.async {
-					cell.poster?.image = UIImage(data: data)
-				}
-			}
-		}
+		cell.populateFrom(movie:movie)
 		
 
 		return cell
