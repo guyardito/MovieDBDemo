@@ -9,14 +9,14 @@
 import UIKit
 
 
-class MovieList_VC: UITableViewController {
+class MovieInfo_Table: UITableViewController {
 	
 	
-	var movies: [PagedMovies.Movie] = []
+	var movies: [MovieInfo] = []
 	
-	let popularQueryService = MovieDBQueryService(queryType: .Popular)
+	let popularQueryService = MovieDB_DataServer(queryType: .Popular)
 	
-	var queryService:MovieDBQueryService?
+	var queryService:MovieDB_DataServer?
 	
 	
 	
@@ -63,7 +63,7 @@ class MovieList_VC: UITableViewController {
 	
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: "movieCell", for: indexPath) as! MovieCell
+		let cell = tableView.dequeueReusableCell(withIdentifier: "movieCell", for: indexPath) as! MovieInfo_Cell
 		
 		let movie = movies[indexPath.row]
 		

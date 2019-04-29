@@ -9,15 +9,15 @@
 import UIKit
 
 
-class CustomTabBarController: UITabBarController {
+class MovieCategory_TabBar: UITabBarController {
 	
 	
 	func makeVCAndNavController(queryType:QueryType, title:String, tag:Int) -> UINavigationController {
 		
 		let storyboard = UIStoryboard(name: "Main", bundle: nil)
 		
-		let vc = storyboard.instantiateViewController(withIdentifier: "MovieList_VC") as! MovieList_VC
-		vc.queryService = MovieDBQueryService(queryType: queryType)
+		let vc = storyboard.instantiateViewController(withIdentifier: "MovieList_VC") as! MovieInfo_Table
+		vc.queryService = MovieDB_DataServer(queryType: queryType)
 		vc.startDownload()
 		let navController = UINavigationController()
 		navController.viewControllers = [vc]

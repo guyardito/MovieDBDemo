@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MovieCell: UITableViewCell {
+class MovieInfo_Cell: UITableViewCell {
 	
 	@IBOutlet var title:UILabel?
 	@IBOutlet var posterPath:UILabel?

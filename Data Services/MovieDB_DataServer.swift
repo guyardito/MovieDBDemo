@@ -10,9 +10,22 @@ import Foundation
 
 
 
-class MovieDBQueryService {
+enum QueryType : String {
+	case NowPlaying =  "now_playing"  // 55 pages
+	case Popular =  "popular"  // 990 pages
+	case TopRated = "top_rated"  // 357 pages
+	case Upcoming = "upcoming"  // 10 pages
 	
-	typealias QueryResult = ([PagedMovies.Movie]?, Int, Int, String) -> ()
+}
+
+
+
+
+
+
+class MovieDB_DataServer {
+	
+	typealias QueryResult = ([MovieInfo]?, Int, Int, String) -> ()
 	
 	
 	let apiKey = "b4f08cc8d958e1b0f9f17de17a588d3a"
@@ -23,7 +36,7 @@ class MovieDBQueryService {
 	let defaultSession = URLSession(configuration: .default)
 	
 	var dataTask: URLSessionDataTask?
-	var movies: [PagedMovies.Movie] = []
+	var movies: [MovieInfo] = []
 	var errorMessage = ""
 	
 	var queryType:QueryType
@@ -63,11 +76,11 @@ class MovieDBQueryService {
 				let decoder = JSONDecoder()
 				let pagedMovies = try! decoder.decode(PagedMovies.self, from: data)
 				
-				self.movies = self.movies + pagedMovies.results
+				self.movies = self.movies + pagedMovies.movies
 				
-				if pagedMovies.page < pagedMovies.total_pages {
+				if pagedMovies.page < pagedMovies.numberOfPages {
 					DispatchQueue.main.async {
-						pageLoaded(pagedMovies.results, pagedMovies.page, pagedMovies.total_pages, self.errorMessage)
+						pageLoaded(pagedMovies.movies, pagedMovies.page, pagedMovies.numberOfPages, self.errorMessage)
 					}
 					
 					self.getSearchResults(page: pagedMovies.page + 1, pageLoaded: pageLoaded )
@@ -75,7 +88,7 @@ class MovieDBQueryService {
 					
 				} else {
 					print("all done, \(self.movies.count) movies")
-					DispatchQueue.main.async { pageLoaded(pagedMovies.results, pagedMovies.page, pagedMovies.total_pages, self.errorMessage) }
+					DispatchQueue.main.async { pageLoaded(pagedMovies.movies, pagedMovies.page, pagedMovies.numberOfPages, self.errorMessage) }
 				}
 				
 			} else {
