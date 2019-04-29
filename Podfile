@@ -1,4 +1,3 @@
-project '/Users/Shared/MovieDBDemo/MovieDBDemo.xcodeproj'
 platform :ios, '11.1'
 
 target 'MovieDBDemo' do
