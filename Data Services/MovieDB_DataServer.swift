@@ -10,11 +10,18 @@ import Foundation
 
 
 
+
+//•Now Playing <https://developers.themoviedb.org/3/movies/get-now-playing>
+//•Popular <https://developers.themoviedb.org/3/movies/get-popular-movies>
+//•Top Rated <https://developers.themoviedb.org/3/movies/get-top-rated-movies>
+//•Upcoming <https://developers.themoviedb.org/3/movies/get-upcoming>
+
+
 enum MovieCategory : String {
-	case NowPlaying = "now_playing"
-	case Popular = "popular"
-	case TopRated = "top_rated"
-	case Upcoming = "upcoming"
+	case NowPlaying = "Now Playing"
+	case Popular = "Popular"
+	case TopRated = "Top Rated"
+	case Upcoming = "Upcoming"
 	
 }
 
@@ -22,8 +29,74 @@ enum MovieCategory : String {
 
 
 
+typealias FetchCompletion = () -> ()
+
 
 class MovieDB_DataServer {
+	
+	static var shared = MovieDB_DataServer()
+	
+	private var loadersByCategory = [MovieCategory:MovieDB_PageLoader]()
+	
+	
+	
+	private func getCategoryLoaderFor(category:MovieCategory) -> MovieDB_PageLoader {
+		var categoryLoader = loadersByCategory[category]
+		
+		if categoryLoader == nil {
+			categoryLoader = MovieDB_PageLoader(category: category)
+			loadersByCategory[category] = categoryLoader
+		}
+		
+		return categoryLoader!
+	}
+	
+	
+	func numberOfEntriesFor(category:MovieCategory) -> Int {
+		let categoryLoader = getCategoryLoaderFor(category: category)
+		return categoryLoader.numberOfMovies
+	}
+	
+	
+	private func pageFor(category:MovieCategory, index:Int) -> Int {
+		let categoryLoader = getCategoryLoaderFor(category: category)
+		return categoryLoader.pageFor(itemIndex: index)
+	}
+	
+	
+	
+	func fetch(category:MovieCategory, page:Int, doSynchronously:Bool=false, completion:FetchCompletion?=nil) {
+		let categoryLoader = getCategoryLoaderFor(category: category)
+		
+		categoryLoader.fetch(page: page, doSynchronously: doSynchronously, completion: completion)
+	}
+	
+	
+	
+	//	 this assumes that the first item is at index 0
+	func fetch(category:MovieCategory, index:Int) {
+		let categoryLoader = getCategoryLoaderFor(category: category)
+		categoryLoader.fetch(at: index)
+	}
+	
+	
+	
+	func getMovieFrom(category:MovieCategory, at index:Int) -> MovieInfo {
+		let categoryLoader = getCategoryLoaderFor(category: category)
+		return categoryLoader.item(at: index)
+	}
+}
+
+
+
+/*
+This class is intended to load the pages of data for one of the MovieDB categories.
+Pages are requested on-demand and can be requested/loaded in any order
+
+Note that the current requirements and design of the app are such that there is not a danger of multiple threads simultaneously making requests for data from the same category/URL.  Therefore method 'fetch' does not need any special protection.
+*/
+
+fileprivate class MovieDB_PageLoader {
 	
 	typealias QueryResult = ([MovieInfo]?, Int, Int, String) -> ()
 	
@@ -32,39 +105,95 @@ class MovieDB_DataServer {
 	let language = "en-US"
 	
 	
+	var category:MovieCategory
 	
-	let defaultSession = URLSession(configuration: .default)
+	let moviesPerPage = 20  // this defined by MovieDBAPI.  NB the last page may have less than 20
 	
-	var dataTask: URLSessionDataTask?
-	var movies: [MovieInfo] = []
-	var errorMessage = ""
+	var numberOfPages = 0
+	var numberOfMovies = 0
 	
-	var queryType:MovieCategory
+	var slugMovie = MovieInfo(title: "(none)", posterPath: "(none)", overview: "(none)")
+	
+	var moviesByPage = [Int:[MovieInfo]]()
+	
+	
+	let regionFilter:String? = nil  // NB use "US" for United States
 	
 	
 	
-	init(queryType:MovieCategory) {
-		self.queryType = queryType
+	init(category:MovieCategory) {
+		self.category = category
+	}
+	
+	
+	
+	func pageFor(itemIndex:Int) -> Int {
+		return 1 + (itemIndex / moviesPerPage)
 	}
 	
 	
 	
 	
-	func getSearchResults(page:Int, pageLoaded: @escaping QueryResult) {
-		//print("get page \(page)")
+	func apiForCategory(category:MovieCategory) -> String {
 		
-		dataTask?.cancel()
+		let baseURL = "https://api.themoviedb.org/3/movie/"
+		var command = ""
 		
-		var urlComponents = URLComponents(string: "https://api.themoviedb.org/3/movie/\(queryType.rawValue)")
-		urlComponents?.query = "language=\(language)&api_key=\(apiKey)&page=\(page)"
+		switch category {
+		case .NowPlaying:
+			command = "now_playing"
+			
+		case .Popular:
+			command = "popular"
+			
+		case .TopRated:
+			command = "top_rated"
+			
+		case .Upcoming:
+			command = "upcoming"
+		}
 		
-		guard let url = urlComponents?.url else {
-			return }
+		let rv = baseURL + command
+		
+		return rv
+	}
+	
+	
+	
+	
+	
+	let defaultSession = URLSession(configuration: .default)
+	var errorMessage = ""
+	
+	
+	func fetch(page:Int, doSynchronously:Bool=false, completion:FetchCompletion?=nil)  {
+		
+		if moviesByPage[page] != nil {
+			// we either already have the data or are already fetching it, so ignore request
+			return
+		}
+		self.moviesByPage[page] = [MovieInfo]()
+		
+		var dataTask: URLSessionDataTask?
+		
+		let api = apiForCategory(category: category)
+		var urlComponents = URLComponents(string:api)
+		
+		if regionFilter != nil {
+			urlComponents?.query = "language=\(language)&region=\(regionFilter!)&api_key=\(apiKey)&page=\(page)"
+		} else {
+			urlComponents?.query = "language=\(language)&api_key=\(apiKey)&page=\(page)"
+		}
+		
+		guard let url = urlComponents?.url else { return }
 		
 		//print("do \(url)")
 		
+		let semaphore = DispatchSemaphore(value: 0)
+		
+		
 		dataTask = defaultSession.dataTask(with: url) { data, response, error in
-			defer { self.dataTask = nil }
+			defer { dataTask = nil }
 			
 			if let error = error {
 				self.errorMessage += "DataTask error: " + error.localizedDescription + "\n"
@@ -74,22 +203,18 @@ class MovieDB_DataServer {
 				let response = response as? HTTPURLResponse,
 				response.statusCode == 200 {
 				
+				print("loaded \(data.count) bytes")
+				
 				let decoder = JSONDecoder()
 				let pagedMovies = try! decoder.decode(PagedMovies.self, from: data)
 				
-				self.movies = self.movies + pagedMovies.movies
+				self.numberOfPages = pagedMovies.numberOfPages
+				self.numberOfMovies = pagedMovies.numberOfMovies
 				
-				if pagedMovies.page < pagedMovies.numberOfPages {
-					DispatchQueue.main.async {
-						pageLoaded(pagedMovies.movies, pagedMovies.page, pagedMovies.numberOfPages, self.errorMessage)
-					}
-					
-					self.getSearchResults(page: pagedMovies.page + 1, pageLoaded: pageLoaded )
-					return
-					
-				} else {
-					print("all done, \(self.movies.count) movies")
-					DispatchQueue.main.async { pageLoaded(pagedMovies.movies, pagedMovies.page, pagedMovies.numberOfPages, self.errorMessage) }
+				self.moviesByPage[page] = pagedMovies.movies
+				
+				if completion != nil {
+					completion!()
 				}
 				
 			} else {
@@ -99,15 +224,59 @@ class MovieDB_DataServer {
 					//print(response)
 					if let delay = Double(delayString)  {
 						DispatchQueue.main.asyncAfter(deadline: .now() + delay ) {
-							self.getSearchResults(page: page, pageLoaded: pageLoaded )
+							self.fetch(page: page)
 						}
 					}
 				}
 			}
+			
+			if doSynchronously {
+				semaphore.signal()
+			}
 		}
 		
 		dataTask?.resume()
+		
+		if doSynchronously {
+			_ = semaphore.wait(timeout: .distantFuture)
+		}
 	}
+	
+	
+	
+	// this assumes that the first item is at index 0
+	func fetch(at index:Int) {
+		let page = pageFor(itemIndex: index)
+		
+		fetch(page: page)
+	}
+	
+	
+	
+	func item(at index:Int) -> MovieInfo {
+		let page = pageFor(itemIndex: index)
+		
+		let numberOfMoviesOnPreviousPages = ( page - 1 ) * moviesPerPage
+		
+		guard let list = moviesByPage[page] else {
+			slugMovie.overview = "no page loaded for movie at index \(index)"
+			return slugMovie
+		}
+		
+		
+		let offset = index - numberOfMoviesOnPreviousPages
+		
+		
+		guard list.count > offset else {
+			slugMovie.overview = "index \(index) > page size \(list.count)"
+			return slugMovie
+		}
+		
+		
+		return list[offset]
+	}
+	
+	
 	
 }
 

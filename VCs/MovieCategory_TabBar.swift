@@ -12,7 +12,6 @@ import UIKit
 class MovieCategory_TabBar: UITabBarController {
 	
 	
-	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
@@ -22,7 +21,6 @@ class MovieCategory_TabBar: UITabBarController {
 		for (index, c) in categories.enumerated() {
 			let vc = makeVCAndNavController(category: c, title: c.rawValue, tag: index)
 			tabBarList.append(vc)
-			
 		}
 		
 		viewControllers = tabBarList
@@ -36,15 +34,13 @@ class MovieCategory_TabBar: UITabBarController {
 		
 		let vc = storyboard.instantiateViewController(withIdentifier: "MovieInfo_Table_VC") as! MovieInfo_Table
 		vc.category = category
-		vc.queryService = MovieDB_DataServer(queryType: category)
-		vc.startDownload()
-
 		let navController = UINavigationController()
 		navController.viewControllers = [vc]
 		navController.tabBarItem = UITabBarItem(title: title, image: nil, tag: tag)
 		
 		return navController
 	}
+
 	
 
 	

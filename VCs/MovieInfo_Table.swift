@@ -9,35 +9,11 @@
 import UIKit
 
 
+
 class MovieInfo_Table: UITableViewController {
 	
 	
 	var category:MovieCategory = .NowPlaying
-	
-	var movies: [MovieInfo] = []
-	
-	let popularQueryService = MovieDB_DataServer(queryType: .Popular)
-	
-	var queryService:MovieDB_DataServer?
-	
-	
-	
-	
-	func startDownload() {
-		queryService?.getSearchResults(page:1, pageLoaded: { [ weak self ] movies, currentPage, totalPages, errorStr in
-			self?.movies += movies!
-			
-			if currentPage != totalPages {
-				self?.title = "\(100 * currentPage / totalPages)% " + (self?.queryService?.queryType)!.rawValue
-			} else {
-				self?.title = (self?.queryService?.queryType)!.rawValue
-			}
-			
-			if currentPage == 1  ||  currentPage == totalPages  ||  currentPage % 15 == 0 {
-				self?.tableView.reloadData()
-			}
-		} )
-	}
 	
 	
 	
@@ -47,8 +23,18 @@ class MovieInfo_Table: UITableViewController {
 		// Uncomment the following line to preserve selection between presentations
 		// self.clearsSelectionOnViewWillAppear = false
 		
+		self.title = category.rawValue
+		
 		self.tableView.rowHeight = UITableView.automaticDimension
-		self.tableView.estimatedRowHeight = 125.0 // set to whatever your "average" cell height is
+		self.tableView.estimatedRowHeight = 300.0 // set to whatever your "average" cell height is
+		
+		tableView.prefetchDataSource = self
+		
+		MovieDB_DataServer.shared.fetch(category: category, page: 1, doSynchronously: false, completion: {
+			DispatchQueue.main.async {
+				self.tableView.reloadData()
+			}
+		} )
 	}
 	
 	
@@ -60,21 +46,23 @@ class MovieInfo_Table: UITableViewController {
 	
 	
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return movies.count
+		let total = MovieDB_DataServer.shared.numberOfEntriesFor(category: category)
+		return total
 	}
+	
 	
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "movieCell", for: indexPath) as! MovieInfo_Cell
 		
-		let movie = movies[indexPath.row]
+		let movie = MovieDB_DataServer.shared.getMovieFrom(category: category, at: indexPath.row)
 		
 		cell.title?.text = movie.title
 		cell.posterPath?.text = movie.poster_path
 		cell.overview?.text = movie.overview
 		
 		cell.poster?.image = nil  // make sure we start fresh  :)
-
+		
 		
 		guard let urlAsString = movie.posterURL(width: 200) else {
 			return cell
@@ -92,7 +80,7 @@ class MovieInfo_Table: UITableViewController {
 			}
 		}
 		
-				
+
 		return cell
 	}
 	
@@ -109,3 +97,26 @@ class MovieInfo_Table: UITableViewController {
 	*/
 	
 }
+
+
+
+
+extension  MovieInfo_Table: UITableViewDataSourcePrefetching {
+	
+	func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+		//print("prefetchRowsAt \(indexPaths)")
+		indexPaths.forEach {
+			MovieDB_DataServer.shared.fetch(category: category, index: $0.row)
+		}
+	}
+	
+	
+	func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
+		print("cancelPrefetchingForRowsAt \(indexPaths)")
+		for _ in  indexPaths {
+			print(".")
+			// we're not worrying about cancelling in this app because each download is fairly small (about 12k)
+		}
+	}
+}
+
