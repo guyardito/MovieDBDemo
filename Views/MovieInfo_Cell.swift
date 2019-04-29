@@ -43,6 +43,7 @@ class MovieInfo_Cell: UITableViewCell {
 		}
 		
 		guard let url = URL(string: urlAsString) else {
+			print("ERROR error creating URL from \(urlAsString)")
 			return
 		}
 		

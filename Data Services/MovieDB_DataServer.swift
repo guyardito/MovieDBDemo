@@ -263,7 +263,9 @@ fileprivate class MovieDB_PageLoader {
 			urlComponents?.query = "language=\(language)&api_key=\(apiKey)&page=\(page)"
 		}
 		
-		guard let url = urlComponents?.url else { return }
+		guard let url = urlComponents?.url else {
+			print("ERROR error creating URLComponents from \(api)")
+			return }
 		
 		//print("do \(url)")
 		
