@@ -47,7 +47,7 @@ class MovieInfo_Cell: UITableViewCell {
 			return
 		}
 		
-		DispatchQueue.global(qos: .userInitiated).async {
+		DispatchQueue.main.async {
 			self.poster?.kf.setImage(with:url)  // use Kingfisher: will use cache and also update imageView on the main thread
 		}
 		
