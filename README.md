@@ -1,6 +1,8 @@
 # MovieDBDemo
 simple demo of accessing the public APIs of TheMovieDB.org
 
+![](MovieDB.gif)
+
 ### V2.0.3 Change Log
 * Refactor names to improve consistency and clarity
 * Add new class MovieDB_App to encapsulate global values (such as which categories to display)
